@@ -1,12 +1,43 @@
-model_options:
-  test_size: 0.2
-  random_state: 3
+model_repeat_buyer:
   features:
-    - engines
-    - passenger_capacity
-    - crew
-    - d_check_complete
-    - moon_clearance_complete
-    - iata_approved
-    - company_rating
-    - review_scores_rating
+    - weekday_<lambda>
+    - hour_median
+    - price_sum
+    - price_mean
+    - payment_type_<lambda>
+    - payment_installments_mean
+    - payment_value_sum
+    - payment_value_mean
+    - review_score_mean
+    - product_photos_qty_mean
+    - delivery_time_mean
+    - distinct_product_categories
+  target: repeat_buyer
+  classify: 1
+model_freight_value:
+  features:
+    - price_mean
+    - price_sum
+    - geolocation_lat_mean
+    - geolocation_lng_mean
+    - product_weight_g_mean
+    - volume_mean
+    - weekday_<lambda>
+    - season_<lambda>
+    - delivery_time_mean
+  target: freight_value_mean
+  classify: 0
+model_delivery_time:
+  features:
+    - weekday_<lambda>
+    - hour_median
+    - price_mean
+    - freight_value_mean
+    - product_weight_g_mean
+    - customer_city_<lambda>
+    - customer_state_<lambda>
+    - geolocation_lat_mean
+    - geolocation_lng_mean
+    - avg_distance_km
+  target: delivery_time_mean
+  classify: 0

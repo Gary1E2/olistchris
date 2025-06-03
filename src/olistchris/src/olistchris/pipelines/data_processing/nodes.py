@@ -51,38 +51,6 @@ def haversine(lat1, lon1, lat2, lon2):
     return 2 * R * atan2(sqrt(a), sqrt(1 - a))
 
 
-
-# spaceflights demo start
-def preprocess_companies(companies: pd.DataFrame) -> pd.DataFrame:
-    """Preprocesses the data for companies.
-
-    Args:
-        companies: Raw data.
-    Returns:
-        Preprocessed data, with `company_rating` converted to a float and
-        `iata_approved` converted to boolean.
-    """
-    companies["iata_approved"] = _is_true(companies["iata_approved"])
-    companies["company_rating"] = _parse_percentage(companies["company_rating"])
-    return companies
-
-
-def preprocess_shuttles(shuttles: pd.DataFrame) -> pd.DataFrame:
-    """Preprocesses the data for shuttles.
-
-    Args:
-        shuttles: Raw data.
-    Returns:
-        Preprocessed data, with `price` converted to a float and `d_check_complete`,
-        `moon_clearance_complete` converted to boolean.
-    """
-    shuttles["d_check_complete"] = _is_true(shuttles["d_check_complete"])
-    shuttles["moon_clearance_complete"] = _is_true(shuttles["moon_clearance_complete"])
-    shuttles["price"] = _parse_money(shuttles["price"])
-    return shuttles
-# spaceflights demo end
-
-
 def preprocess_orders(orders: pd.DataFrame) -> pd.DataFrame:
     """Preprocesses the data for orders.
 
@@ -107,7 +75,7 @@ def create_model_input_table(
     customers: pd.DataFrame, orders: pd.DataFrame, order_items: pd.DataFrame,
     payments: pd.DataFrame, reviews: pd.DataFrame, products: pd.DataFrame,
     sellers: pd.DataFrame, geolocation: pd.DataFrame, product_translation: pd.DataFrame
-) -> pd.DataFrame:
+    ) -> pd.DataFrame:
     """Combines all data to create a model input table.
 
     Args:
@@ -137,6 +105,7 @@ def create_model_input_table(
     df = df.drop(['customer_zip_code_prefix', 'customer_id'], axis=1)
 
     # ENGINEERING FEATURES:
+    df['season'] = df['month'].apply(month_to_season)
     # Calculate last purchase date per customer
     last_purchase = df.groupby('customer_unique_id')['order_purchase_timestamp'].max().reset_index(name='last_purchase_date')
 

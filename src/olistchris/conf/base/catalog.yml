@@ -84,9 +84,19 @@ model_input_table:
   type: pandas.ParquetDataset
   filepath: data/03_primary/model_input_table.parquet
 
-regressor:
+repeat_buyer_classifier:
   type: pickle.PickleDataset
-  filepath: data/06_models/regressor.pickle
+  filepath: data/06_models/repeat_buyer_classifier.pickle
+  versioned: true
+
+freight_value_regressor:
+  type: pickle.PickleDataset
+  filepath: data/06_models/freight_value_regressor.pickle
+  versioned: true
+
+delivery_time_regressor:
+  type: pickle.PickleDataset
+  filepath: data/06_models/delivery_time_regressor.pickle
   versioned: true
 
 shuttle_passenger_capacity_plot_exp:
