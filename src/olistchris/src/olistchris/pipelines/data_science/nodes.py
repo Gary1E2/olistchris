@@ -12,7 +12,7 @@ from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, roc_curve, auc, classification_report
 from sklearn.metrics import mean_absolute_error, r2_score, mean_squared_error
-from sklearn.ensemble import GradientBoostingRegressor, RandomForestRegressor, AdaBoostRegressor
+from sklearn.ensemble import GradientBoostingRegressor, RandomForestRegressor, AdaBoostRegressor, GradientBoostingClassifier
 
 
 def split_data(data: pd.DataFrame, parameters: dict) -> tuple:
@@ -62,13 +62,14 @@ def train_repeat_buyer(X_train: pd.DataFrame, y_train: pd.Series) -> DecisionTre
 
     Args:
         X_train: Training data of independent features.
-        y_train: Training data for price.
+        y_train: Training data for target.
 
     Returns:
-        Trained model.
+        Trained classifier model.
     """
-    classifier = DecisionTreeClassifier(max_depth=9, max_features=14, min_samples_leaf=2,
-                                          min_samples_split=7, splitter='best', random_state=42)
+    classifier = GradientBoostingClassifier(n_estimators=66, min_samples_split=3, min_samples_leaf=3,
+                                             max_features=8, max_depth=6, learning_rate=0.25,
+                                               random_state=42)
     classifier.fit(X_train, y_train)
     return classifier
 
@@ -78,10 +79,10 @@ def train_freight_value(X_train: pd.DataFrame, y_train: pd.Series) -> DecisionTr
 
     Args:
         X_train: Training data of independent features.
-        y_train: Training data for price.
+        y_train: Training data for target.
 
     Returns:
-        Trained model.
+        Trained regressor model.
     """
     classifier = GradientBoostingRegressor(random_state=42, loss='absolute_error', max_depth=8,
                                      max_features=7, min_samples_leaf=3, min_samples_split=2,
@@ -95,10 +96,10 @@ def train_delivery_time(X_train: pd.DataFrame, y_train: pd.Series) -> DecisionTr
 
     Args:
         X_train: Training data of independent features.
-        y_train: Training data for price.
+        y_train: Training data for target.
 
     Returns:
-        Trained model.
+        Trained regressor model.
     """
     classifier = GradientBoostingRegressor(n_estimators=50, min_samples_split=3, min_samples_leaf=2,
                                             max_features=3, max_depth=5, learning_rate=0.3,
@@ -108,54 +109,98 @@ def train_delivery_time(X_train: pd.DataFrame, y_train: pd.Series) -> DecisionTr
 
 
 def evaluate_classifier(
-    classifier: DecisionTreeClassifier, X_test: pd.DataFrame, y_test: pd.Series
-) -> dict[str, float]:
-    """Calculates and logs the coefficient of determination.
-
-    Args:
-        regressor: Trained model.
-        X_test: Testing data of independent features.
-        y_test: Testing data for price.
-    """
-    y_pred = classifier.predict(X_test)
-
-    # init confusion matrix
-    cm = confusion_matrix(y_test, y_pred)
-    tn, fp, fn, tp = confusion_matrix(y_test, y_pred).ravel()
-
-    # custom metric calculations
-    accuracy = accuracy_score(y_test, y_pred)
-    precision = precision_score(y_test, y_pred, average='weighted')
-    recall = recall_score(y_test, y_pred, average='weighted')
-    f1 = f1_score(y_test, y_pred, average='weighted')
-    specificity = tn / (tn+fp)
-    logger = logging.getLogger(__name__)
-    logger.info("Model has a coefficient test acc of %.3f on test data.", accuracy)
-    return {"accuracy": accuracy, "precision": precision , "recall": recall,
-             "f1": f1, "specificity": specificity}
-
-
-def evaluate_regressor(
-    regressor: DecisionTreeClassifier, X_test: pd.DataFrame, y_test: pd.Series,
+    classifier: DecisionTreeClassifier, X_test: pd.DataFrame, y_test: pd.Series,
     X_train: pd.DataFrame, y_train: pd.Series
 ) -> dict[str, float]:
     """Calculates and logs the coefficient of determination.
 
     Args:
-        regressor: Trained model.
+        regressor: Trained classifier model.
+        X_test: Testing data of independent features.
+        y_test: Testing data for target.
+        X_train: Training data of independent features.
+        y_train: Training data for target.
+    Returns:
+        metric logs + metrics
+    """
+    data_list = [[X_train, y_train, "Train"], [X_test, y_test, "Test"]]
+    metrics_dict = {}
+    logger = logging.getLogger(__name__)
+    for i, data in enumerate(data_list):
+        # data evaluations
+        pred_classes = classifier.predict(data[0])
+        true_classes = data[1]
+
+        # init confusion matrix
+        cm = confusion_matrix(true_classes, pred_classes)
+        tn, fp, fn, tp = confusion_matrix(true_classes, pred_classes).ravel()
+
+        # get results
+        accuracy = accuracy_score(true_classes, pred_classes)
+        precision = precision_score(true_classes, pred_classes, average='weighted')
+        recall = recall_score(true_classes, pred_classes, average='weighted')
+        f1 = f1_score(true_classes, pred_classes, average='weighted')
+        specificity = tn / (tn+fp)
+
+
+        # get roc auc
+        for j in range(2):
+            scores = classifier.predict_proba(X_test)[:, j]
+            fpr, tpr, _ = roc_curve(y_test == j, scores)
+            roc_auc = auc(fpr, tpr)
+
+        # display results
+        logger.info(data[2])
+        logger.info("------------------------------------------------------------------------------")
+        logger.info("Classifier accuracy: %.3f", accuracy)
+        logger.info("Classifier precision: %.3f", precision)
+        logger.info("Classifier recall: %.3f", recall)
+        logger.info("Classifier F1: %.3f", f1)
+        logger.info("Classifier specificity: %.3f", specificity)
+        logger.info("Classifier ROC AUC area: %.3f", roc_auc)
+        metrics_dict[data[2] + "_Accuracy"] = accuracy
+        metrics_dict[data[2] + "_Precision"] = precision
+        metrics_dict[data[2] + "_Recall"] = recall
+        metrics_dict[data[2] + "_F1"] = f1
+        metrics_dict[data[2] + "_specificity"] = specificity
+        metrics_dict[data[2] + "_ROCAUC"] = roc_auc
+
+    return metrics_dict
+
+
+def evaluate_regressor(
+    regressor, X_test: pd.DataFrame, y_test: pd.Series,
+    X_train: pd.DataFrame, y_train: pd.Series
+) -> dict[str, float]:
+    """Calculates and logs the coefficient of determination.
+
+    Args:
+        regressor: Trained regressor model.
         X_test: Testing data of independent features.
         y_test: Testing data for target.
         X_train: Training data of independent features.
         X_test: Testing data for target.
+    Returns:
+        metrics logs + metrics
     """
-    test_mae = mean_absolute_error(y_test, regressor.predict((X_test))) * -1
-    train_mae = mean_absolute_error(y_train, regressor.predict((X_train))) * -1
-    test_mse = mean_squared_error(y_test, regressor.predict((X_test))) * -1
-    train_mse = mean_squared_error(y_train, regressor.predict((X_train))) * -1
-    test_r2 = r2_score(y_test, regressor.predict((X_test)))
-    train_r2 = r2_score(y_train, regressor.predict((X_train)))
+
+    y_pred = regressor.predict(X_train)
+    train_mae = mean_absolute_error(y_train, y_pred) * -1
+    train_mse = mean_squared_error(y_train, y_pred) * -1
+    train_r2 = r2_score(y_train, y_pred)
+
+    y_pred = regressor.predict(X_test)
+    test_mae = mean_absolute_error(y_test, y_pred) * -1
+    test_mse = mean_squared_error(y_test, y_pred) * -1
+    test_r2 = r2_score(y_test, y_pred)
     
     logger = logging.getLogger(__name__)
-    logger.info("Model has a coefficient test mae of %.3f on test data.", test_mae)
-    return {"test_mae": test_mae, "train_mae": train_mae, "test_mse": test_mse, "train_mse": train_mse,
-            "test_r2": test_r2, "train_r2": train_r2}
+    logger.info("Train Regressor MAE: %.3f", train_mae)
+    logger.info("Train Regressor MSE: %.3f", train_mse)
+    logger.info("Train Regressor R^2: %.3f", train_r2)
+    logger.info("Test Regressor MAE: %.3f", test_mae)
+    logger.info("Test Regressor MSE: %.3f", test_mse)
+    logger.info("Test Regressor R^2: %.3f", test_r2)
+    
+    return {"train_mae": train_mae, "train_mse": train_mse, "train_r2": train_r2, 
+            "test_mae": test_mae, "test_mse": test_mse, "test_r2": test_r2}

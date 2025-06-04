@@ -15,13 +15,13 @@ def create_pipeline(**kwargs) -> Pipeline:
             node(
                 func=train_repeat_buyer,
                 inputs=["X_train_repeat", "y_train_repeat"],
-                outputs="repeat_buyer_classfier",
+                outputs="repeat_buyer_classifier",
                 name="train_repeat_buyer_node",
             ),
             node(
                 func=evaluate_classifier,
-                inputs=["repeat_buyer_classfier", "X_test_repeat", "y_test_repeat"],
-                outputs="repeat_buyer_metrics",
+                inputs=["repeat_buyer_classifier", "X_test_repeat", "y_test_repeat", "X_train_repeat", "y_train_repeat"],
+                outputs="repeat_buyer_test_metrics",
                 name="evaluate_repeat_buyer_model_node",
             ),
             node(
@@ -39,7 +39,7 @@ def create_pipeline(**kwargs) -> Pipeline:
             node(
                 func=evaluate_regressor,
                 inputs=["freight_value_regressor", "X_test_freight", "y_test_freight", "X_train_freight", "y_train_freight"],
-                outputs="freight_value_metrics",
+                outputs="freight_value_test_metrics",
                 name="evaluate_freight_value_model_node",
             ),
             node(
@@ -57,7 +57,7 @@ def create_pipeline(**kwargs) -> Pipeline:
             node(
                 func=evaluate_regressor,
                 inputs=["delivery_time_regressor", "X_test_delivery", "y_test_delivery", "X_train_delivery", "y_train_delivery"],
-                outputs="delivery_time_metrics",
+                outputs="delivery_time_test_metrics",
                 name="evaluate_delivery_time_model_node",
             ),
         ]

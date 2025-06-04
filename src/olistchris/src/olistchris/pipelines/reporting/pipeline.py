@@ -1,9 +1,9 @@
 from kedro.pipeline import Pipeline, node, pipeline
 
 from .nodes import (
-    compare_passenger_capacity_exp,
-    compare_passenger_capacity_go,
     create_confusion_matrix,
+    create_roc_auc,
+    create_cont_eval
 )
 
 
@@ -12,19 +12,32 @@ def create_pipeline(**kwargs) -> Pipeline:
     return pipeline(
         [
             node(
-                func=compare_passenger_capacity_exp,
-                inputs="preprocessed_shuttles",
-                outputs="shuttle_passenger_capacity_plot_exp",
-            ),
-            node(
-                func=compare_passenger_capacity_go,
-                inputs="preprocessed_shuttles",
-                outputs="shuttle_passenger_capacity_plot_go",
-            ),
-            node(
                 func=create_confusion_matrix,
-                inputs="companies",
-                outputs="dummy_confusion_matrix",
+                inputs=["repeat_buyer_classifier", "X_test_repeat", "y_test_repeat",
+                        "X_train_repeat", "y_train_repeat"],
+                outputs="repeat_buyer_cm",
+                name="repeat_confusion_matrix_node"
+            ),
+            node(
+                func=create_roc_auc,
+                inputs=["repeat_buyer_classifier", "X_test_repeat", "y_test_repeat",
+                        "X_train_repeat", "y_train_repeat"],
+                outputs="repeat_buyer_rocauc",
+                name="repeat_roc_auc_node"
+            ),
+            node(
+                func=create_cont_eval,
+                inputs=["freight_value_regressor", "X_test_freight", "y_test_freight",
+                        "X_train_freight", "y_train_freight"],
+                outputs="freight_value_conteval",
+                name="freight_cont_eval_node"
+            ),
+            node(
+                func=create_cont_eval,
+                inputs=["delivery_time_regressor", "X_test_delivery", "y_test_delivery",
+                        "X_train_delivery", "y_train_delivery"],
+                outputs="delivery_time_conteval",
+                name="delivery_cont_eval_node"
             ),
         ]
     )
