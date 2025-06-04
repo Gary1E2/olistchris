@@ -40,8 +40,8 @@ def split_data(data: pd.DataFrame, parameters: dict) -> tuple:
 
         # Transform the data
         X_processed = preprocessor.fit_transform(X)
-        X_train, X_test, y_train, y_test = train_test_split(X_processed, y, stratify=y, test_size=0.2,
-                                                             random_state=42)
+        X_train, X_test, y_train, y_test = train_test_split(X_processed, y, stratify=y, test_size=parameters['test_size'],
+                                                             random_state=parameters['random_state'])
     else:
         # Preprocessing pipeline for regressors
         preprocessor = ColumnTransformer([
@@ -57,7 +57,7 @@ def split_data(data: pd.DataFrame, parameters: dict) -> tuple:
     return X_train, X_test, y_train, y_test
 
 
-def train_repeat_buyer(X_train: pd.DataFrame, y_train: pd.Series) -> DecisionTreeClassifier:
+def train_repeat_buyer(X_train: pd.DataFrame, y_train: pd.Series, parameters: dict) -> DecisionTreeClassifier:
     """Trains the repeat buyer model.
 
     Args:
@@ -67,14 +67,14 @@ def train_repeat_buyer(X_train: pd.DataFrame, y_train: pd.Series) -> DecisionTre
     Returns:
         Trained classifier model.
     """
-    classifier = GradientBoostingClassifier(n_estimators=66, min_samples_split=3, min_samples_leaf=3,
-                                             max_features=8, max_depth=6, learning_rate=0.25,
-                                               random_state=42)
+    classifier = GradientBoostingClassifier(n_estimators=parameters["n_estimators"], min_samples_split=parameters["min_samples_split"], min_samples_leaf=parameters["min_samples_leaf"],
+                                             max_features=parameters["max_features"], max_depth=parameters["max_depth"], learning_rate=parameters["learning_rate"],
+                                               random_state=parameters["random_state"])
     classifier.fit(X_train, y_train)
     return classifier
 
 
-def train_freight_value(X_train: pd.DataFrame, y_train: pd.Series) -> DecisionTreeClassifier:
+def train_freight_value(X_train: pd.DataFrame, y_train: pd.Series, parameters:dict) -> DecisionTreeClassifier:
     """Trains the freight value model.
 
     Args:
@@ -84,14 +84,14 @@ def train_freight_value(X_train: pd.DataFrame, y_train: pd.Series) -> DecisionTr
     Returns:
         Trained regressor model.
     """
-    classifier = GradientBoostingRegressor(random_state=42, loss='absolute_error', max_depth=8,
-                                     max_features=7, min_samples_leaf=3, min_samples_split=2,
-                                       n_estimators=86, learning_rate=0.22)
+    classifier = GradientBoostingRegressor(random_state=parameters["random_state"], loss=parameters["loss"], max_depth=parameters["max_depth"],
+                                     max_features=parameters["max_features"], min_samples_leaf=parameters["min_samples_leaf"], min_samples_split=parameters["min_samples_split"],
+                                       n_estimators=parameters["n_estimators"], learning_rate=parameters["learning_rate"])
     classifier.fit(X_train, y_train)
     return classifier
 
 
-def train_delivery_time(X_train: pd.DataFrame, y_train: pd.Series) -> DecisionTreeClassifier:
+def train_delivery_time(X_train: pd.DataFrame, y_train: pd.Series, parameters: dict) -> DecisionTreeClassifier:
     """Trains the delivery time model.
 
     Args:
@@ -101,9 +101,9 @@ def train_delivery_time(X_train: pd.DataFrame, y_train: pd.Series) -> DecisionTr
     Returns:
         Trained regressor model.
     """
-    classifier = GradientBoostingRegressor(n_estimators=50, min_samples_split=3, min_samples_leaf=2,
-                                            max_features=3, max_depth=5, learning_rate=0.3,
-                                            random_state=42, loss='absolute_error')
+    classifier = GradientBoostingRegressor(n_estimators=parameters["n_estimators"], min_samples_split=parameters["min_samples_split"], min_samples_leaf=parameters["min_samples_leaf"],
+                                            max_features=parameters["max_features"], max_depth=parameters["max_depth"], learning_rate=parameters["learning_rate"],
+                                            random_state=parameters["random_state"], loss=parameters["loss"])
     classifier.fit(X_train, y_train)
     return classifier
 

@@ -14,7 +14,7 @@ def create_pipeline(**kwargs) -> Pipeline:
             ),
             node(
                 func=train_repeat_buyer,
-                inputs=["X_train_repeat", "y_train_repeat"],
+                inputs=["X_train_repeat", "y_train_repeat", "params:model_repeat_buyer"],
                 outputs="repeat_buyer_classifier",
                 name="train_repeat_buyer_node",
             ),
@@ -32,7 +32,7 @@ def create_pipeline(**kwargs) -> Pipeline:
             ),
             node(
                 func=train_freight_value,
-                inputs=["X_train_freight", "y_train_freight"],
+                inputs=["X_train_freight", "y_train_freight", "params:model_freight_value"],
                 outputs="freight_value_regressor",
                 name="train_freight_value_node",
             ),
@@ -50,7 +50,7 @@ def create_pipeline(**kwargs) -> Pipeline:
             ),
             node(
                 func=train_delivery_time,
-                inputs=["X_train_delivery", "y_train_delivery"],
+                inputs=["X_train_delivery", "y_train_delivery", "params:model_delivery_time"],
                 outputs="delivery_time_regressor",
                 name="train_delivery_time_node",
             ),
