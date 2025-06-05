@@ -1,0 +1,21 @@
+confusion_matrix:
+  figsize_x: 12
+  figsize_y: 6
+  fmt: "d"
+  cmap: "rocket_r"
+roc_auc:
+  figsize_x: 12
+  figsize_y: 6
+  baseline_color: "gray"
+  lw: 2
+  linestyle: "--"
+  x_lim: 1.0
+  y_lim: 1.05
+cont_eval:
+  figsize_x: 12
+  figsize_y: 6
+  alpha: 0.2
+  baseline_color: "cornflowerblue"
+  lw: 2
+  x_lim: 410
+  y_lim: 410
