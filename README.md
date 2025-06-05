@@ -107,9 +107,13 @@ run.sh : runnable file for full pipeline execution
 - seaborn ~= 0.13.1
 
 # Overview of EDA:
-The EDA provided useful insights into repeat buyer classification and two regression targets: freight value and delivery time. 
+General EDA was performed to gather insights into the raw datasets before merging them. The insights gathered will not only help with model building but understanding the underlying patterns and relationships within the data for Olist.
 
-The repeat buyer target classes shows inbalance, some features showing noticeable differences between buyer types. The regression targets, both freight value and delivery time had skewed distributions, with a small number of extreme values. Several features suggest meaningful relationships with each target allowing for potential prediction.
+The model EDA provided useful insights into repeat buyer classification and two regression targets: freight value and delivery time. 
+
+The repeat buyer target classes shows inbalance, some features showing noticeable differences between buyer types. 
+
+The regression targets, both freight value and delivery time had skewed distributions, with a small number of extreme values. Several features suggest meaningful relationships with each target allowing for potential prediction.
 
 # Pipeline Instructions:
 ## Pipeline Execution:
@@ -163,6 +167,54 @@ The provided datasets are ingested into the data_processing pipeline where only 
 The final dataset is fed into the data_science pipeline where it is split, selecting only relevant features for predicting a target feature. The split data is used for training before being evaluated using multiple metrics, depending on model type. The metrics are printed out as logs when the nodes are running. This is repeated 2 more times for the next 2 models, storing the models in a .pickle format in the data folder under 06_models.
 
 The saved models and split data, which is saved in the memory are used to create graphical plots, representing their metrics and performances. The classifer model is used to create a confusion matrix and ROC AUC plot while the other two regressor models are used to create true vs predicted plots.
+
+# Pipeline Running Flow:
+### data preprocessing pipeline
+- raw datasets
+    - node: preprocess orders
+- raw datasets + preprocessed orders dataset
+    - node: create model input data
+- final model input dataset
+
+### data science pipeline
+- final model input dataset
+    - node: split data (for repeat buyer model)
+- X_train, X_test, y_train, y_test
+    - node: train repeat buyer
+- trained repeat buyer classifier
+    - node: evaluate classifier
+- print repeat buyer classifer metrics
+
+- final model input dataset
+    - node: split data (for freight value model)
+- X_train, X_test, y_train, y_test
+    - node: train freight value
+- trained freight value regressor
+    - node: evaluate regressor
+- print freight value regressor metrics
+
+- final model input dataset
+    - node: split data (for delivery time model)
+- X_train, X_test, y_train, y_test
+    - node: train delivery time
+- trained delivery time regressor
+    - node: evaluate regressor
+- print delivery time regressor metrics
+
+### reporting pipeline
+- trained repeat buyer classifier
+    - node: create confusion matrix
+- save repeat buyer classifier confusion matrix plot
+    - node: create roc auc 
+- save repeat buyer classifier roc auc plot
+
+- trained freight value regressor
+    - node: create cont eval
+- save freight value regressor continuous evaluation plot
+
+- trained delivery time regressor
+    - node: create cont eval
+- save delivery time regressor contiuous evaluation plot
 
 # Model Selection:
 ## Repeat Buyers Classifer: 
