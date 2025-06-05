@@ -1,6 +1,9 @@
 # Olistchris subtitle
 Data Engineering and Machine Learning Development on Brazilian E-Commerce Dataset by Olist.
 
+# Git hub link:
+https://github.com/Gary1E2/olistchris
+
 # Olistchris Description
 Olist is a Brazilian e-commerce marketplace like Lazada, Taobao and Shopee, it is a sales
 platform that connects small retailers with customers.
@@ -183,18 +186,28 @@ Both testing and training data was used to evaluate the model, allowing a gauge 
 ## Repeat Buyer Classifer:
 ### Test 
 Accuracy: 0.9939
+
 Precision: 0.9939
+
 Recall: 0.9939
+
 F1 Score: 0.9939
+
 Specificity: 0.9967
+
 ROC AUC Area: 0.9999
 
 ### Train 
 Accuracy: 0.9998
+
 Precision: 0.9998
+
 Recall: 0.9998
+
 F1 Score: 0.9998
+
 Specificity: 0.9998
+
 ROC AUC Area: 1.0000
 
 
@@ -203,12 +216,16 @@ Accuracy was used as the standard metric along with other metrics depending on c
 ## Freight Value Mean Regressor:
 ### Test 
 MAE: -4.0805
+
 MSE: -76.6362
+
 R^2: 0.6735
 
 ### Train 
 MAE: -3.6017
+
 MSE: -65.5677
+
 R^2: 0.7388
 
 Mean Absolute Error was used as the primary metric as it was resistant to outliers allowing a clearer evaluation of the model's errors. This is followed by R Squared/R^2 which shows how well the model's predictions fit the true values, -1 being poor, 0 being equal to mean prediction and 1 being perfectly fitting the true values. Mean Squared Error is used to evaluate the model's supceptibility to outliers, increasing the error by a significant amount to highlight it.
@@ -216,15 +233,23 @@ Mean Absolute Error was used as the primary metric as it was resistant to outlie
 ## Delivery Time Mean Regressor:
 ### Test 
 MAE: -4.8699
+
 MSE: -71.6436
+
 R^2: 0.1927
 
 ### Train 
 MAE: -4.7454
+
 MSE: -70.5480
+
 R^2: 0.2128
 
 The same metrics are used here although there is more emphasis on R Squared/R^2 with how poor the model was performing.
 
 # Model Considerations:
+Tree based models are relatively unaffected by feature scaling. This allows a simpler data processing stage where skewed data and targets are not required to be scaled before model training.
 
+Ensemble models allows multiple trees to combine their predictions to produce a robust model that generalizes better with improved performance metrics.
+
+RandomizedSearchCV is eventually used over GridSearchCV due to time constraints as RandomizedSearchCV is faster for model training.
