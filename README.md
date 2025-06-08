@@ -72,10 +72,15 @@ unused files/folders kept for future project expansion
         ...
 
 Dockerfile : for running a jupyter lab server container
+
 eda.ipynb : ipynb file for eda
+
 models.ipynb : ipynb file for model building
+
 README.md : project context file (this file)
+
 requirements.txt : project dependencies for installing
+
 run.sh : runnable file for full pipeline execution
 
 ## Project Programming Language: 
@@ -187,6 +192,7 @@ The saved models and split data, which is saved in the memory are used to create
     - node: evaluate classifier
 - print repeat buyer classifer metrics
 
+
 - final model input dataset
     - node: split data (for freight value model)
 - X_train, X_test, y_train, y_test
@@ -194,6 +200,7 @@ The saved models and split data, which is saved in the memory are used to create
 - trained freight value regressor
     - node: evaluate regressor
 - print freight value regressor metrics
+
 
 - final model input dataset
     - node: split data (for delivery time model)
@@ -210,9 +217,11 @@ The saved models and split data, which is saved in the memory are used to create
     - node: create roc auc 
 - save repeat buyer classifier roc auc plot
 
+
 - trained freight value regressor
     - node: create cont eval
 - save freight value regressor continuous evaluation plot
+
 
 - trained delivery time regressor
     - node: create cont eval
