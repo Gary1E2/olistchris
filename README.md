@@ -22,7 +22,7 @@ Olist can expand and retain their customer base by providing estimated delivery 
 ### Conclusion
 Olist can design and deploy more effective and targeted marketing campaigns for repeat customers. Trust and expectations can be built upon users by offering reliable, additional funtionalities.
 
-# Changes to add after Presentation:
+# Changes added after Presentation:
 - containerizing run.sh
 - README.md changes
 
@@ -150,6 +150,8 @@ Example for model pipeline:
 kedro run --pipeline data_science
 
 ## Docker Desktop Container Running:
+There are 2 docker files being used for the Jupyter and run.sh containers called JupyterLabDocker and PipelineDocker respectively.
+
 ### Jupyter Lab
 - docker build -f JupyterLabDocker -t my-jupyter-app .
 - docker run -p 8888:8888 my-jupyter-app
